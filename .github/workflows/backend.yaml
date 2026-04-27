@@ -1,0 +1,46 @@
+name: Deploy Backend
+
+on:
+  push:
+    paths:
+      - "server/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Yandex Cloud CLI
+        run: |
+          curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+          echo "$HOME/yandex-cloud/bin" >> $GITHUB_PATH
+
+      - name: Auth with Service Account
+        run: |
+          echo '${{ secrets.YC_SERVICE_ACCOUNT_KEY }}' > key.json
+          yc config set service-account-key key.json
+          yc config set cloud-id $(yc config get cloud-id)
+          yc config set folder-id $(yc config get folder-id)
+
+      - name: Configure Docker
+        run: yc container registry configure-docker
+
+      - name: Build Docker image
+        run: |
+          docker build -t cr.yandex/${{ secrets.YC_REGISTRY_ID }}/backend:latest ./server
+
+      - name: Push Docker image
+        run: |
+          docker push cr.yandex/${{ secrets.YC_REGISTRY_ID }}/backend:latest
+
+      - name: Deploy to Serverless Container
+        run: |
+          yc serverless container revision deploy \
+            --container-name ${{ secrets.YC_CONTAINER_NAME }} \
+            --image cr.yandex/${{ secrets.YC_REGISTRY_ID }}/backend:latest \
+            --cores 1 \
+            --memory 512M \
+            --service-account-id ${{ secrets.YC_SERVICE_ACCOUNT_ID }}
