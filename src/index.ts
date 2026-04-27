@@ -33,7 +33,7 @@ app.get("/health", (req: Request, res: Response) => {
 });
 
 app.get("/ping", (req, res) => {
-  res.send("pong");
+  res.send("ping pong");
 });
 
 app.use("/api/items", itemsRouter);
