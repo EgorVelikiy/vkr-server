@@ -3,7 +3,7 @@ name: Deploy Backend
 on:
   push:
     paths:
-      - "server/**"
+      - "**"
 
 jobs:
   deploy:
