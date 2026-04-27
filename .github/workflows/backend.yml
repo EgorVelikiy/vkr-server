@@ -28,7 +28,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t cr.yandex/${{ secrets.YC_REGISTRY_ID }}/backend:latest ./server
+          docker build -t cr.yandex/${{ secrets.YC_REGISTRY_ID }}/backend:latest .
 
       - name: Push Docker image
         run: |
@@ -39,6 +39,6 @@ jobs:
           yc serverless container revision deploy \
             --container-name ${{ secrets.YC_CONTAINER_NAME }} \
             --image cr.yandex/${{ secrets.YC_REGISTRY_ID }}/backend:latest \
-            --cores 1 \
+            --cores 2 \
             --memory 512M \
             --service-account-id ${{ secrets.YC_SERVICE_ACCOUNT_ID }}
