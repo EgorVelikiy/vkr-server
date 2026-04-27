@@ -22,8 +22,6 @@ jobs:
         run: |
           echo '${{ secrets.YC_SERVICE_ACCOUNT_KEY }}' > key.json
           yc config set service-account-key key.json
-          yc config set cloud-id $(yc config get cloud-id)
-          yc config set folder-id $(yc config get folder-id)
 
       - name: Configure Docker
         run: yc container registry configure-docker
